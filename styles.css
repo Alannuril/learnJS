@@ -16,7 +16,7 @@ body {
 .heading {
     font-family: 'Jersey 15';  
     font-weight: 500; 
-    font-size: 2.5em; 
+    font-size: 3.5em; 
     text-align: center; 
     color: #213555;
     margin: 0;
@@ -80,6 +80,7 @@ footer {
     text-align: center;
     background-color: #6a80b9;
     padding: 30px;
+    font-weight: bold;
 }
 
 a {
