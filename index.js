@@ -1,77 +1,91 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const resultDiv = document.getElementById("result");
     const playerScoreSpan = document.getElementById("playerScore");
     const computerScoreSpan = document.getElementById("computerScore");
-    const choices = document.querySelectorAll(".choice");
     const roundDiv = document.getElementById("round");
-    const maxRounds = 5;
+    const choices = document.querySelectorAll(".choice");
+    const resetButton = document.getElementById("resetButton");
+
     let playerScore = 0;
     let computerScore = 0;
-    let currentRound = 0;
+    let round = 0;
 
+    // Fungsi untuk mendapatkan pilihan komputer
     function getComputerChoice() {
-        const randomValue = Math.floor(Math.random() * 3);
-        if (randomValue === 0) {
-            return "rock";
-        } else if (randomValue === 1) {
-            return "paper";
+        const choices = ["rock", "paper", "scissors"];
+        const randomIndex = Math.floor(Math.random() * 3);
+        return choices[randomIndex];
+    }
+
+    // Fungsi untuk memainkan satu ronde
+    function playRound(playerSelection) {
+        const computerSelection = getComputerChoice();
+        round++;
+        roundDiv.textContent = `Round: ${round}`;
+
+        // Tentukan hasil ronde
+        if (playerSelection === computerSelection) {
+            resultDiv.textContent = `It's a tie! Both chose ${playerSelection}.`;
+        } else if (
+            (playerSelection === "rock" && computerSelection === "scissors") ||
+            (playerSelection === "paper" && computerSelection === "rock") ||
+            (playerSelection === "scissors" && computerSelection === "paper")
+        ) {
+            playerScore++;
+            resultDiv.textContent = `You win! ${playerSelection} beats ${computerSelection}.`;
         } else {
-            return "scissors";
+            computerScore++;
+            resultDiv.textContent = `You lose! ${computerSelection} beats ${playerSelection}.`;
+        }
+
+        // Perbarui skor
+        playerScoreSpan.textContent = playerScore;
+        computerScoreSpan.textContent = computerScore;
+
+        // Cek apakah ada pemenang
+        if (playerScore === 5 || computerScore === 5) {
+            announceWinner();
         }
     }
 
-    choices.forEach(choice => {
-        choice.addEventListener("click", function() {
-            if (currentRound < maxRounds) {
-                const playerChoice = this.id; // Mengambil ID gambar yang diklik
-                const computerChoice = getComputerChoice();
+    // Fungsi untuk mengumumkan pemenang
+    function announceWinner() {
+        if (playerScore === 5) {
+            resultDiv.textContent = "Congratulations! You won the game! 🎉";
+        } else {
+            resultDiv.textContent = "Sorry, the computer won the game. 😢";
+        }
+        disableButtons();
+    }
 
-                resultDiv.textContent = `Anda memilih: ${playerChoice}, Komputer memilih: ${computerChoice}.`;
+    // Fungsi untuk menonaktifkan tombol setelah permainan selesai
+    function disableButtons() {
+        choices.forEach(button => {
+            button.disabled = true;
+        });
+    }
 
-                // Tentukan pemenang
-                if (playerChoice === computerChoice) {
-                    resultDiv.textContent += " Hasil: Seri!";
-                } else if (
-                    (playerChoice === "rock" && computerChoice === "scissors") ||
-                    (playerChoice === "paper" && computerChoice === "rock") ||
-                    (playerChoice === "scissors" && computerChoice === "paper")
-                ) {
-                    playerScore++;
-                    playerScoreSpan.textContent = playerScore;
-                    resultDiv.textContent += " Hasil: Anda Menang!";
-                } else {
-                    computerScore++;
-                    computerScoreSpan.textContent = computerScore;
-                    resultDiv.textContent += " Hasil: Komputer Menang!";
-                }
+    // Fungsi untuk mereset permainan
+    function resetGame() {
+        playerScore = 0;
+        computerScore = 0;
+        round = 0;
+        playerScoreSpan.textContent = playerScore;
+        computerScoreSpan.textContent = computerScore;
+        resultDiv.textContent = "No results yet!";
+        roundDiv.textContent = `Round: ${round}`;
+        choices.forEach(button => {
+            button.disabled = false;
+        });
+    }
 
-                currentRound++;
-                roundDiv.textContent = `Ronde: ${currentRound}/${maxRounds}`;
-
-                // Jika sudah mencapai ronde maksimum, tampilkan hasil akhir
-                if (currentRound === maxRounds) {
-                    setTimeout(() => {
-                        if (playerScore > computerScore) {
-                            resultDiv.textContent = "Anda adalah pemenang keseluruhan!";
-                        } else if (playerScore < computerScore) {
-                            resultDiv.textContent = "Komputer adalah pemenang keseluruhan!";
-                        } else {
-                            resultDiv.textContent = "Permainan berakhir seri!";
-                        }
-                    }, 600); // Delay sedikit sebelum menampilkan hasil akhir
-                }
-            }
+    // Tambahkan event listener ke tombol pilihan
+    choices.forEach(button => {
+        button.addEventListener("click", function () {
+            playRound(this.id); // Menggunakan ID tombol sebagai pilihan pemain
         });
     });
 
-    // Event listener untuk tombol reset
-    document.getElementById("resetButton").addEventListener("click", function() {
-        playerScore = 0;
-        computerScore = 0; 
-        currentRound = 0; 
-        playerScoreSpan.textContent = playerScore; 
-        computerScoreSpan.textContent = computerScore; 
-        resultDiv.textContent = "No result yet"; 
-        roundDiv.textContent = `Ronde: ${currentRound}/${maxRounds}`; 
-    });
+    // Tambahkan event listener ke tombol reset
+    resetButton.addEventListener("click", resetGame);
 });
